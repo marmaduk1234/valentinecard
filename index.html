@@ -13,34 +13,35 @@
             background-color: #ffebf0;
             text-align: center;
             font-family: Arial, sans-serif;
+            overflow: hidden;
         }
         .container {
             position: relative;
         }
         .heart-card {
-            width: 150px;
-            height: 150px;
+            width: 180px;
+            height: 180px;
             background-color: red;
             position: relative;
             transform: rotate(45deg);
             cursor: pointer;
-            transition: transform 1s ease-in-out;
+            transition: transform 1s ease-in-out, opacity 1s ease-in-out;
         }
         .heart-card::before,
         .heart-card::after {
             content: '';
-            width: 150px;
-            height: 150px;
+            width: 180px;
+            height: 180px;
             background-color: red;
             border-radius: 50%;
             position: absolute;
         }
         .heart-card::before {
-            top: -75px;
+            top: -90px;
             left: 0;
         }
         .heart-card::after {
-            left: -75px;
+            left: -90px;
             top: 0;
         }
         .message {
@@ -50,16 +51,35 @@
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
             margin-top: 20px;
+            position: relative;
+            animation: fadeIn 1.5s ease-in-out;
         }
         .btn {
             margin-top: 20px;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
             background: #ff4d6d;
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             border-radius: 5px;
             cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #e63950;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fireworks {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            display: none;
         }
     </style>
 </head>
@@ -70,22 +90,65 @@
         <div class="message" id="message">
             <h2>🌹 Happy Valentine's Day, My Love! ❤️</h2>
             <p>💌 Subscription successfully renewed for eternity! 💌</p>
-            <p>No matter the distance, my heart is always with you. You are my greatest adventure, the reason even ordinary days feel special, the one who brings warmth and joy into my life, and the one I want to share every tomorrow with. I can't wait for all the beautiful days we will share.</p>
-            <p>Until the moment we meet again, know that you are appreciated, missed, and cherished beyond words.</p>
+            <p>No matter the distance, my heart is always with you...</p>
             <p>💖 Forever yours, Svetlana</p>
             <img src="https://media.giphy.com/media/l0MYB8Ory7Hqefo9a/giphy.gif" width="200px">
         </div>
     </div>
-    
+    <canvas class="fireworks" id="fireworks"></canvas>
     <audio autoplay loop>
         <source src="https://www.dropbox.com/scl/fi/16g22x1paha70c21v5urh/Jason_Mraz_Colbie_Caillat_-_Lucky_-Hydr0.org.mp3?rlkey=t3nszs0amrs9kyvlzlxp3qwdt&raw=1" type="audio/mp3">
         Your browser does not support the audio element.
     </audio>
-    
     <script>
         function openCard() {
             document.getElementById('heart').style.transform = 'scale(0)';
+            document.getElementById('heart').style.opacity = '0';
             document.getElementById('message').style.display = 'block';
+            startFireworks();
+        }
+
+        function startFireworks() {
+            const canvas = document.getElementById("fireworks");
+            const ctx = canvas.getContext("2d");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            canvas.style.display = "block";
+            
+            let particles = [];
+            function createParticles() {
+                for (let i = 0; i < 100; i++) {
+                    particles.push({
+                        x: canvas.width / 2,
+                        y: canvas.height / 2,
+                        vx: Math.random() * 4 - 2,
+                        vy: Math.random() * 4 - 2,
+                        size: Math.random() * 5 + 2,
+                        color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+                        life: 100
+                    });
+                }
+            }
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach((p, i) => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life--;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (p.life <= 0) particles.splice(i, 1);
+                });
+                if (particles.length > 0) {
+                    requestAnimationFrame(animateParticles);
+                } else {
+                    canvas.style.display = "none";
+                }
+            }
+            createParticles();
+            animateParticles();
         }
     </script>
 </body>
